@@ -242,11 +242,20 @@ void butterFly() {
     int n=0;
     printf("Enter a number:\n");
     scanf("%u", &n);
-    for (int i = 0; i < 2*n-1; ++i) {
-        for (int j = 0; j < 2*n; ++j) {
-            if((j <= i || j >= 2*n-1-i) && i < n) {
+
+    for (int i = 0; i < 2*n+1; ++i) {
+        for (int j = 0; j < 2*n+2; ++j) {
+            if((i == 0 || i == 2*n) && (j <= 2 || j>= 2*n-1)){
+                printf("#");
+            }else if(j == 0 || j == 2*n+1){
+                printf("#");
+            }else if((j==i+1 && i<n) || (j==i && i>n)){
+                printf("#");
+            }else if((j+i == 2*n && i<n) || (j+i == 2*n+1 && i>n)){
+                printf("#");
+            }else if((j <= i || j >= 2*n+1-i) && i < n) {
                 printf("*");
-            } else if((j > i || j < 2*n-1-i) && i >= n) {
+            } else if((j > i || j < 2*n+1-i) && i >= n) {
                 printf("*");
             } else{
                 printf(" ");
