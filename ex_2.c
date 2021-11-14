@@ -139,35 +139,35 @@ void baseToDecimal() {
     int digitIndex = 0;
     printf("Enter base and a number:\n");
     scanf("%d %lu", &userBaseChoice, &num);
-    if(num < 0){
-        printf("Error!");
-        return;
-    }
+    //if the number is already in decimal presentation, print it and exit function
     if(userBaseChoice == DECIMAL_BASE){
         printf("%lu", num);
-    } else {
-        divisionRes = num;
-        while (divisionRes != 0) {
-            divisionRemainder = divisionRes % DECIMAL_BASE;
-            if(divisionRemainder >= userBaseChoice){
-                printf("Error!");
-                return;
-            }
-            total += divisionRemainder * (unsigned long)powl(userBaseChoice, (long double)digitIndex);
-            divisionRes /= DECIMAL_BASE;
-            digitIndex++;
-        }
-        printf("%lu\n", total);
+        return;
     }
+    divisionRes = num;
+    //going digit by digit and adding it's decimal value to a total variable
+    while (divisionRes != 0) {
+        divisionRemainder = divisionRes % DECIMAL_BASE;
+        //checks if all of the digits are compatible with the users base choice
+        if(divisionRemainder >= userBaseChoice){
+            printf("Error!");
+            return;
+        }
+        //calculating each digit decimal value, multiplying it by its base pow its location
+        total += divisionRemainder * (unsigned long)powl(userBaseChoice, (long double)digitIndex);
+        //dividing the number by 10 to go to the next digit
+        divisionRes /= DECIMAL_BASE;
+        digitIndex++;
+    }
+    printf("%lu\n", total);
 }
 
 void plus() {
     const int DECIMAL_BASE = 10;
-    char dummy;
     unsigned long num1;
     unsigned long num2;
     unsigned long temp1;
-    unsigned long temp2;
+    int maxPadding = 0;
     unsigned long bigNum = 0;
     unsigned long smallNum = 0;
     unsigned int divisionRemainder1;
@@ -177,10 +177,9 @@ void plus() {
     unsigned long currRes = 0;
     unsigned long totalRes = 0;
     unsigned int digitIndex = 0;
+    unsigned int totalIterations = 0;
     printf("Enter 2 binary numbers:\n");
     scanf("%lu %lu", &num1,&num2);
-    temp1 = num1;
-    temp2 = num2;
     if(num1 > num2){
         bigNum = num1;
         smallNum = num2;
@@ -188,83 +187,83 @@ void plus() {
         bigNum = num2;
         smallNum = num1;
     }
-    while (bigNum > 0){
+    temp1 =bigNum;
+    while (temp1 > 0){
+        totalIterations++;
+        temp1 /= DECIMAL_BASE;
+    }
+    while (digitIndex <= totalIterations){
         divisionRemainder1 = bigNum % DECIMAL_BASE;
         divisionRemainder2 = smallNum % DECIMAL_BASE;
         currRes = (divisionRemainder1 + divisionRemainder2 + currCarry) % 2;
+        totalRes += currRes * (unsigned long)pow(DECIMAL_BASE, digitIndex);
+        if(digitIndex == totalIterations){
+            break;
+        }
         currCarry = (divisionRemainder1 + divisionRemainder2 + currCarry) / 2;
         totalCarry += currCarry * (unsigned long)pow(DECIMAL_BASE, digitIndex + 1);
-        totalRes += currRes * (unsigned long)pow(DECIMAL_BASE, digitIndex);
         digitIndex++;
         bigNum /= DECIMAL_BASE;
         smallNum /= DECIMAL_BASE;
     }
-    printf("%lu\n", totalCarry);
-    printf("%lu\n", num1);
-    printf("+\n");
-    printf("%lu\n", num2);
-    printf("-----");
-    printf("%lu\n", totalRes);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    while (temp1 !=0 && temp2 !=0){
-//        divisionRemainder1 = temp1 % DECIMAL_BASE;
-//        divisionRemainder2 = temp2 % DECIMAL_BASE;
-//        if(divisionRemainder1 != 0 && divisionRemainder1 != 1 || divisionRemainder2 != 0 && divisionRemainder2 != 1){
-//            printf("Error!\n");
-//            scanf("%c", &dummy);
-//            return;
-//        }
-//        temp1 /= DECIMAL_BASE;
-//        temp2 /= DECIMAL_BASE;
-//    }
+    maxPadding = (int)totalIterations + (int)currCarry;
+    printf("%0*lu\n%0*lu\n+\n%0*lu\n",maxPadding,totalCarry,maxPadding, num1, maxPadding, num2);
+    for (int i = 0; i < maxPadding; ++i) {
+        printf("-");
+    }
+    printf("\n");
+    printf("%0*lu\n",maxPadding, totalRes);
 }
 
+/*************************************************************************************************************
+* Function Name: butterFly
+* Input: none
+* Output: none
+* Function Operation: the function asks the user for a number, and prints a butterfly that its height is 2n-1
+*                     and its width is 2n, wrapped by a # frame so that its final height is 2n+1 and final
+*                     width is 2n+2.
+**************************************************************************************************************/
 void butterFly() {
-    int n=0;
+    int n = 0;
     printf("Enter a number:\n");
     scanf("%u", &n);
-
+    //if n == 0 print only the # frame
+    if(n == 0){
+        printf("##\n##\n");
+        return;
+    }
     for (int i = 0; i < 2*n+1; ++i) {
         for (int j = 0; j < 2*n+2; ++j) {
-            if((i == 0 || i == 2*n) && (j <= 2 || j>= 2*n-1)){
+            //print # for the frame top and bottom rows
+            if((i == 0 || i == 2*n) && (j <= 2 || j>= 2*n-1)) {
                 printf("#");
-            }else if(j == 0 || j == 2*n+1){
+            }
+            //print # for the frame side columns
+            else if(j == 0 || j == 2*n+1) {
                 printf("#");
-            }else if((j==i+1 && i<n) || (j==i && i>n)){
+            }
+            //print # for the frame main diagonal
+            else if((j == i+1 && i<n) || (j == i && i>n)) {
                 printf("#");
-            }else if((j+i == 2*n && i<n) || (j+i == 2*n+1 && i>n)){
+            }
+            //print # for the frame second diagonal
+            else if((j+i == 2*n && i<n) || (j+i == 2*n+1 && i>n)) {
                 printf("#");
-            }else if((j <= i || j >= 2*n+1-i) && i < n) {
+            }
+            //print * for the butterfly body, top part
+            else if((j <= i || j >= 2*n+1-i) && i < n) {
                 printf("*");
-            } else if((j > i || j < 2*n+1-i) && i >= n) {
+            }
+            //print * for the butterfly body, bottom part
+            else if((j > i || j < 2*n+1-i) && i >= n) {
                 printf("*");
-            } else{
+            }else{
                 printf(" ");
             }
         }
         printf("\n");
     }
-    //i=0, j=0, 2n-1
-    //i=1, j=0,1,2n-2,2n-1
 }
 
 /************************************************************************************************************
