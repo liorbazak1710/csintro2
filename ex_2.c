@@ -184,8 +184,8 @@ void plus() {
     //going digit by digit in both numbers and add it, save the result and the carry
     while (digitIndex <= totalIterations){
         //the remainder of the division of each number by 10 will be the rightmost digit
-        divisionRemainder1 = bigNum % DECIMAL_BASE;
-        divisionRemainder2 = smallNum % DECIMAL_BASE;
+        divisionRemainder1 = num1 % DECIMAL_BASE;
+        divisionRemainder2 = num2 % DECIMAL_BASE;
         //printing error in case the input is invalid (digits are not 0/1)
         if(divisionRemainder1 > 1 || divisionRemainder2 > 1){
             printf("Error!\n");
@@ -208,12 +208,12 @@ void plus() {
         totalCarry += currCarry * (unsigned long)pow(DECIMAL_BASE, digitIndex + 1);
         digitIndex++;
         //dividing the numbers by 10 to go to the next digit
-        bigNum /= DECIMAL_BASE;
-        smallNum /= DECIMAL_BASE;
+        num1 /= DECIMAL_BASE;
+        num2 /= DECIMAL_BASE;
     }
     //checking how many digits we have at most, for padding with 0 the smaller numbers
     maxPadding = (int)totalIterations + (int)currCarry;
-    printf("%0*lu\n%0*lu\n+\n%0*lu\n",maxPadding,totalCarry,maxPadding, num1, maxPadding, num2);
+    printf("%0*lu\n%0*lu\n+\n%0*lu\n",maxPadding,totalCarry,maxPadding, bigNum, maxPadding, smallNum);
     for (int i = 0; i < maxPadding; ++i) {
         printf("-");
     }
