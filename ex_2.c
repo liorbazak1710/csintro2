@@ -33,22 +33,21 @@ int convertHextoDec(char hexDigit){
     return -1;
 }
 
-/**************************************************************************************************************
+/***************************************************************************************************************
 * Function Name: hexToDec
 * Input: none
 * Output: none
-* Function Operation: the function asks the user for a hexadecimal value in reversed order,and convert it to
-*                    decimal-it takes one char each time, checks if the values entered are valid, converts them
-*                    to decimal using the 'convertHextoDec' function, and prints the decimal value result
-***************************************************************************************************************/
+* Function Operation: the function asks the user for a hexadecimal value in reversed order,and converts it to
+*                     decimal-it takes one char each time, checks if the values entered are valid, converts them
+*                     to decimal using the 'convertHextoDec' function, and prints the decimal value result
+****************************************************************************************************************/
 void hexToDec() {
+    const int HEX_BASE = 16;
     //defining a dummy variable for cleaning the scanf buffer
     char dummy;
-    const int HEX_BASE = 16;
     char hexDigit;
     int decDigit = 0;
-    long long int decSum = 0;
-    long long int digitIndex = 0;
+    long long int decSum = 0, digitIndex = 0;
     printf("Enter a reversed number in base 16:\n");
     while(1) {
         /*
@@ -96,10 +95,8 @@ void hexToDec() {
 *                     the last division (dividing multiple times until 0) and goes up.
 ************************************************************************************************************/
 void decimalToBase() {
-    int userBaseChoice;
-    unsigned long decVal;
-    unsigned long divisionRes;
-    int exponent = 0;
+    int userBaseChoice, exponent = 0;
+    unsigned long decVal = 0, divisionRes = 0;
     printf("Enter base and a number:\n");
     scanf("%d %lu", &userBaseChoice, &decVal);
     //get the integer value of the exponent needed to get from the user chosen base to the decimal number.
@@ -131,12 +128,8 @@ void decimalToBase() {
 **************************************************************************************************************/
 void baseToDecimal() {
     const int DECIMAL_BASE = 10;
-    int userBaseChoice;
-    unsigned long num;
-    unsigned long divisionRes;
-    unsigned long divisionRemainder;
-    unsigned long total = 0;
-    int digitIndex = 0;
+    int userBaseChoice, digitIndex = 0;
+    unsigned long num = 0, divisionRes = 0, divisionRemainder = 0, total = 0;
     printf("Enter base and a number:\n");
     scanf("%d %lu", &userBaseChoice, &num);
     //if the number is already in decimal presentation, print it and exit function
@@ -162,51 +155,63 @@ void baseToDecimal() {
     printf("%lu\n", total);
 }
 
+/***************************************************************************************************************
+* Function Name: plus
+* Input: none
+* Output: none
+* Function Operation: the function asks the user for 2 binary numbers, checks if the input is valid, add the
+*                     numbers by going digit by digit, and printing the carry line, the numbers, and the result.
+****************************************************************************************************************/
 void plus() {
     const int DECIMAL_BASE = 10;
-    unsigned long num1;
-    unsigned long num2;
-    unsigned long temp1;
+    const int BINARY_BASE = 2;
+    unsigned long num2 = 0, num1 = 0, temp1 = 0, bigNum = 0, smallNum = 0,
+                  totalCarry = 0, currCarry = 0, currRes = 0, totalRes = 0;
+    unsigned int divisionRemainder1 = 0, divisionRemainder2 = 0, digitIndex = 0,totalIterations = 0;
     int maxPadding = 0;
-    unsigned long bigNum = 0;
-    unsigned long smallNum = 0;
-    unsigned int divisionRemainder1;
-    unsigned int divisionRemainder2;
-    unsigned long totalCarry = 0;
-    unsigned long currCarry = 0;
-    unsigned long currRes = 0;
-    unsigned long totalRes = 0;
-    unsigned int digitIndex = 0;
-    unsigned int totalIterations = 0;
+
     printf("Enter 2 binary numbers:\n");
     scanf("%lu %lu", &num1,&num2);
-    if(num1 > num2){
-        bigNum = num1;
-        smallNum = num2;
-    } else{
-        bigNum = num2;
-        smallNum = num1;
-    }
-    temp1 =bigNum;
+    //checking which number is bigger and insert the values to the corresponding variables
+    bigNum = num1 > num2 ? num1 : num2;
+    smallNum= num1 <= num2 ? num1 : num2;
+    //checking how many digits the big number has, to know how many iterations we need for the main loop
+    temp1 = bigNum;
     while (temp1 > 0){
         totalIterations++;
         temp1 /= DECIMAL_BASE;
     }
+    //going digit by digit in both numbers and add it, save the result and the carry
     while (digitIndex <= totalIterations){
+        //the remainder of the division of each number by 10 will be the rightmost digit
         divisionRemainder1 = bigNum % DECIMAL_BASE;
         divisionRemainder2 = smallNum % DECIMAL_BASE;
-        currRes = (divisionRemainder1 + divisionRemainder2 + currCarry) % 2;
+        //printing error in case the input is invalid (digits are not 0/1)
+        if(divisionRemainder1 > 1 || divisionRemainder2 > 1){
+            printf("Error!\n");
+            return;
+        }
+        //the current result will be the remainder of the sum of 2 digits and the carry, divided by 2
+        currRes = (divisionRemainder1 + divisionRemainder2 + currCarry) % BINARY_BASE;
+        //the total result will be the current result, mult by its location index in the whole number
         totalRes += currRes * (unsigned long)pow(DECIMAL_BASE, digitIndex);
+        //stop the loop here if we reached the last digits
         if(digitIndex == totalIterations){
             break;
         }
-        currCarry = (divisionRemainder1 + divisionRemainder2 + currCarry) / 2;
+        //the current carry will be the sum of 2 digits and the previous curry, divided by 2
+        currCarry = (divisionRemainder1 + divisionRemainder2 + currCarry) / BINARY_BASE;
+        /*
+        the total carry will be the current carry, mult by its location index+1 in the whole number,
+        since the carry starts from the 2nd index on (the 1st index will always be 0)
+        */
         totalCarry += currCarry * (unsigned long)pow(DECIMAL_BASE, digitIndex + 1);
         digitIndex++;
+        //dividing the numbers by 10 to go to the next digit
         bigNum /= DECIMAL_BASE;
         smallNum /= DECIMAL_BASE;
     }
-
+    //checking how many digits we have at most, for padding with 0 the smaller numbers
     maxPadding = (int)totalIterations + (int)currCarry;
     printf("%0*lu\n%0*lu\n+\n%0*lu\n",maxPadding,totalCarry,maxPadding, num1, maxPadding, num2);
     for (int i = 0; i < maxPadding; ++i) {
@@ -276,10 +281,7 @@ void butterFly() {
 *************************************************************************************************************/
 void countBits() {
     const int BINARY_BASE = 2;
-    unsigned long decVal;
-    unsigned long count = 0;
-    unsigned long divisionRes;
-    unsigned long divisionRemainder;
+    unsigned long decVal = 0, count = 0, divisionRes = 0, divisionRemainder = 0;
     printf("enter a number:\n");
     scanf("%lu", &decVal);
     divisionRes = decVal;
@@ -298,18 +300,16 @@ void countBits() {
 
 int main() {
     int enterKey= 0;
-    //char dummy;
     while(enterKey!=7) {
         printf("Choose an option:\n"
-               "    1. hexadecimal to Decimal\n"
-               "    2. Decimal to Base\n"
-               "    3. Base to Decimal\n"
-               "    4. PLUS\n"
-               "    5. Shape\n"
-               "    6. Count bits\n"
-               "    7. Exit\n");
+               "\t1. hexaDecimal to Decimal\n"
+               "\t2. Decimal to Base\n"
+               "\t3. Base to Decimal\n"
+               "\t4. PLUS\n"
+               "\t5. Shape\n"
+               "\t6. Count bits\n"
+               "\t7. Exit\n");
         scanf("%d",&enterKey);
-        //scanf("%c", &dummy);
         switch (enterKey) {
             case 1:
                 hexToDec();
